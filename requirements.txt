@@ -1,0 +1,25 @@
+# Core deep learning
+torch==2.11.0+cu128
+torchvision
+ultralytics==8.4.46
+
+# Scientific computing
+numpy==2.2.6
+pandas==2.3.3
+scipy==1.15.3
+
+# Visualization
+matplotlib==3.10.9
+seaborn==0.13.2
+
+# Image processing
+pillow
+opencv-python
+imageio
+
+# Notebook (optional, only for exploratory notebooks)
+jupyterlab
+ipykernel
+
+# Note: For CUDA 12.8 (Blackwell GPUs e.g. RTX 50-series), install PyTorch from:
+#   pip install torch==2.11.0 --index-url https://download.pytorch.org/whl/cu128
