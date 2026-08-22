@@ -1,6 +1,8 @@
 # ============ Datasets (download separately) ============
-Dataset/
-DHCD/
+# anchored to the repository root, otherwise these also swallow runs/dhcd/
+/Dataset/
+/DHCD/
+/DatasetPhiard/
 data/*.png
 data/*.jpg
 data/*.jpeg
@@ -14,7 +16,13 @@ data/processed/
 weights/
 
 # ============ Training outputs ============
-runs/
+# The per-run logs under runs/ ARE published: args.yaml records the exact
+# configuration of each run and results.csv the per-epoch curves. Only the
+# heavy artifacts are excluded.
+runs/**/weights/
+runs/**/*.png
+runs/**/*.jpg
+runs/**/*.jpeg
 kernel_snapshots/
 kernel_snapshots_full/
 logs/

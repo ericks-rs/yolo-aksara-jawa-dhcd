@@ -1,155 +1,192 @@
 # Reassessing the Role of Attention Mechanisms in YOLO for Character Classification
 
-This repository contains the source code, experimental scripts, and result tables for the paper:
+Source code, experiment logs, and per-seed results for the paper:
 
 > **Reassessing the Role of Attention Mechanisms in YOLO for Character Classification: Multi-Seed Empirical Evidence from Javanese and Devanagari Scripts**
 >
 > Ericks Rachmat Swedia¹, Cakra Trinata²
 >
-> ¹Department of Informatics Engineering, Faculty of Industrial Technology, Gunadarma University, Depok, West Java, Indonesia
-> ²Immigration Technology Management Study Program, Department of Immigration, Politeknik Imigrasi (Indonesia Immigration Polytechnic), Tangerang, Banten, Indonesia
+> ¹Department of Informatics Engineering, Faculty of Industrial Technology, Gunadarma University, Depok, Jawa Barat, Indonesia
+> ²Department of Immigration, Study Program in Immigration Technology Management, Politeknik Imigrasi dan Pemasyarakatan Indonesia, Tangerang, Banten, Indonesia
 >
-> Submitted to: *Bulletin of Electrical Engineering and Informatics (BEEI)*, 2026
+> Under review at *Bulletin of Electrical Engineering and Informatics (BEEI)*, submission 13400
 
 ## Overview
 
-This study reassesses whether the C2PSA attention block in modern YOLO architectures (YOLO11, YOLO26) provides measurable benefits for character classification of low-resource Indic scripts. Three YOLO generations (YOLOv8n, YOLO11n, YOLO26n) are compared on two datasets, Javanese (Aksara Jawa) and Devanagari (DHCD), under a multi-seed evaluation protocol (5 seeds per configuration), supplemented by direct ablation of the C2PSA block. The findings indicate that attention-equipped models do not provide a statistically significant advantage over attention-free counterparts, and in some cases the attention block introduces training instability.
+Modern YOLO releases have added attention to the backbone, and YOLO11 and YOLO26 both carry a C2PSA spatial attention block that YOLOv8 does not have. This study asks whether that block earns its place when the task is isolated character classification, where a single glyph sits on a near-empty background.
 
-## Key Findings
+Three YOLO generations (YOLOv8n, YOLO11n, YOLO26n) are compared on two Indic scripts, Javanese (Aksara Jawa) and Devanagari (DHCD), with five seeds per configuration, followed by a direct ablation that removes the C2PSA block and replaces it with a structurally similar C3k2 block. Across every setting the attention-equipped variants show no consistent advantage, and on the smaller dataset the attention block makes training measurably less stable.
 
-- **No significant advantage** of attention-equipped YOLO architectures for character classification (ANOVA p = 0.107–0.673; significant only in favor of pre-attention YOLOv8, p = 0.036)
-- **C2PSA ablation** shows removing attention either maintains or improves accuracy (Cohen's d up to −1.13 in favor of no-attention variant)
-- **Training instability** introduced by attention on small datasets (worst-case accuracy collapse to 85%)
-- **Data leakage** identified in the Kaggle Aksara Jawa dataset; a corrected splitting protocol is proposed
+## Key findings
 
-## Repository Structure
+- **No consistent advantage from attention.** ANOVA across the three generations ranges from p = 0.673 down to p = 0.036, and the one significant result favors the pre-attention YOLOv8n.
+- **Removing C2PSA does not hurt, and usually helps.** Cohen's d reaches -1.13 on the Aksara Jawa clean split, a large effect in favor of the attention-free variant.
+- **Attention widens the failure mode.** One with-attention run collapsed mid-training, with validation loss jumping from 0.68 to 20.76 in a single epoch and accuracy falling to 4.30%, below the 5% that random guessing gives on 20 classes. No attention-free run behaves like this. See `figures/fig4_convergence.pdf`.
+- **The public Aksara Jawa split leaks.** Exactly 25.00% of its validation images are augmented variants of images that appear in the training partition. A corrected split is provided.
+
+## The data leakage, quantified
+
+The Kaggle Aksara Jawa dataset ships pre-augmented. Filenames follow the pattern `<base><n>.<tag>.png`, where tags such as `.r10`, `.rm10`, `.b`, and `.meki` mark rotation, blur, and other transforms of one underlying image. In the distributed split, variants of the same base image land in both partitions.
+
+Measured on the distributed split:
+
+| | Naive split (as distributed) | Clean split (`clean_split_aksara.py`) |
+|---|---|---|
+| Train images | 2,154 | 2,076 |
+| Validation images | 480 | 558 |
+| Base IDs shared between train and val | 20 of 399 | **0 of 399** |
+| **Validation images that leak** | **120 of 480 (25.00%)** | **0** |
+| Leaked images per class | 6, uniform across all 20 classes | 0 |
+
+The correction groups every augmented variant of one base image into a single partition, then splits at the level of base IDs rather than files, holding out roughly 20% of base IDs per class with a fixed shuffle seed of 42. Run it with:
+
+```bash
+python scripts/clean_split_aksara.py
+```
+
+Absolute accuracy is not comparable across the two splits, because regrouping changes both the size and the difficulty profile of the validation set. Only the ranking of architectures within a split is meaningful.
+
+## Training configuration actually used
+
+Every value below is recorded in the published `runs/<experiment>/<run>/args.yaml` files and in the training logs preserved in the notebook outputs.
+
+| | Aksara Jawa | DHCD |
+|---|---|---|
+| Max epochs | 50 | 50 |
+| Early stopping patience | 5 | 5 |
+| Image size | 128 x 128 | 32 x 32 |
+| Batch size | 64 | 128 |
+| Data loader workers | 4 | 4 |
+| Optimizer selection | `optimizer='auto'` | `optimizer='auto'` |
+| Optimizer chosen by the framework | **AdamW**, lr 0.000417, momentum 0.9 | **MuSGD**, lr 0.01, momentum 0.9 |
+| Weight decay on the decayed group | 0.0005 | 0.001 |
+| Learning rate schedule | default linear decay (`cos_lr=False`) | same |
+| Augmentation | Ultralytics classification default, identical for every model | same |
+| Seeds | 7, 42, 123, 999, 2024 | same |
+
+Two points are worth reading carefully.
+
+**`args.yaml` does not show the effective optimizer.** It records `lr0: 0.01` and `momentum: 0.937`, which are the Ultralytics defaults as passed in. Because `optimizer='auto'` was used, the framework discarded those and picked its own, printing the choice to the training log. The effective values are the ones in the table above.
+
+**Augmentation was on, not off.** The default Ultralytics classification pipeline was active (`auto_augment=randaugment`, `erasing=0.4`, `fliplr=0.5`, `scale=0.5`). It was applied identically to every architecture, so it cannot favor any of them, but it was not disabled.
+
+The multi-version comparison used ImageNet pretrained weights. The ablation runs build from a `.yaml` config, so they start from random initialization.
+
+## Reproducing the results
+
+The reported numbers come from the notebooks, which are the reproduction path:
+
+| Notebook | Produces |
+|---|---|
+| `notebooks/04c_compare_clean.ipynb` | Three-generation comparison, Aksara Jawa clean split |
+| `notebooks/05c_ablation_clean.ipynb` | C2PSA ablation, Aksara Jawa clean split |
+| `notebooks/06_dhcd_validation.ipynb` | Three-generation comparison and ablation on DHCD |
+| `notebooks/01_dataset_analysis.ipynb` | Dataset exploration and the leakage inspection |
+
+`scripts/02_train.py` is a single-run convenience wrapper. It did not produce the published results, and its defaults were aligned in August 2026 with the configuration above so that it no longer contradicts them.
+
+Figures are regenerated with:
+
+```bash
+python scripts/generate_paper_figures.py   # Figures 1 to 3
+python scripts/make_fig4.py                # Figure 4, convergence traces
+```
+
+`make_fig4.py` reads the per-epoch logs under `runs/ablation_c2psa_clean/`, so it needs no GPU and no retraining.
+
+## Repository layout
 
 ```
 .
-├── README.md                         # This file
-├── LICENSE                           # MIT License
-├── requirements.txt                  # Python dependencies
-├── .gitignore                        # Files excluded from git
+├── README.md
+├── LICENSE                            MIT
+├── requirements.txt
 │
-├── configs/                          # YOLO model configurations
-│   ├── yolo26-cls-attn.yaml          # With C2PSA (ablation: attn)
-│   └── yolo26-cls-noattn.yaml        # Without C2PSA (ablation: no-attn)
+├── configs/
+│   ├── yolo26-cls-attn.yaml           with C2PSA
+│   └── yolo26-cls-noattn.yaml         C2PSA replaced by C3k2
 │
-├── scripts/                          # Experiment scripts
-│   ├── 02_train.py                   # CLI training script
-│   ├── dump_architecture.py          # Generate architecture summary
-│   ├── export_kernels_txt.py         # Export kernel weights to .txt
-│   └── generate_paper_figures.py     # Generate Fig. 1, 2, 3
+├── scripts/
+│   ├── clean_split_aksara.py          leakage-corrected split
+│   ├── prep_dhcd.py                   DHCD preparation
+│   ├── 02_train.py                    single-run wrapper
+│   ├── make_fig4.py                   Figure 4
+│   ├── generate_paper_figures.py      Figures 1 to 3
+│   ├── dump_architecture.py
+│   └── export_kernels_txt.py
 │
-├── utils/                            # Helper modules
-│   └── kernel_logger.py              # Callback for saving Conv/Linear weights per epoch
+├── utils/
+│   └── kernel_logger.py               per-epoch Conv and Linear weight snapshots
 │
-├── notebooks/                        # Jupyter notebooks
-│   ├── 01_dataset_analysis.ipynb     # Dataset exploration
-│   ├── 02_train.ipynb                # Basic training
-│   ├── 04c_compare_clean.ipynb       # 3-model comparison (clean split)
-│   ├── 05c_ablation_clean.ipynb      # C2PSA ablation (clean split)
-│   └── 06_dhcd_validation.ipynb      # DHCD cross-script validation
+├── notebooks/                         the reproduction path, see table above
 │
-├── data/                             # Dataset metadata (no images)
-│   └── README.md                     # Instructions to obtain datasets
+├── runs/                              per-run training logs, no weights
+│   └── <experiment>/<run>/
+│       ├── args.yaml                  exact configuration of that run
+│       └── results.csv                per-epoch loss and accuracy
 │
-└── results/                          # Per-seed result tables (CSV)
-    ├── multiseed_results.csv
-    ├── multiseed_clean_results.csv
-    ├── dhcd_multiseed_results.csv
-    ├── ablation_c2psa_results.csv
-    ├── ablation_c2psa_clean_results.csv
-    └── dhcd_ablation_results.csv
+├── results/                           per-seed summary tables behind the paper tables
+│
+├── figures/                           Figures 1 to 4, PNG and PDF
+│
+└── data/README.md                     how to obtain the datasets
 ```
+
+Model weights are not included because of their size. Everything needed to inspect or redraw the training behavior is in `runs/`.
+
+## Datasets
+
+| Dataset | Classes | Images | Source |
+|---|---|---|---|
+| Aksara Jawa | 20 | 2,634 | [Kaggle: phiard/aksara-jawa](https://www.kaggle.com/datasets/phiard/aksara-jawa) |
+| DHCD | 46 | 92,000 | Acharya, Pant and Gyawali (2015), SKIMA, doi:10.1109/SKIMA.2015.7400041 |
+
+Images are not redistributed here. See `data/README.md`.
 
 ## Environment
 
-- **OS**: Windows 11
-- **GPU**: NVIDIA RTX 5080 Laptop (16 GB VRAM, sm_120 / Blackwell)
-- **Python**: 3.10.20 (Anaconda)
-- **CUDA**: 12.8
-- **PyTorch**: 2.11.0+cu128
-- **Ultralytics**: 8.4.46
+| | |
+|---|---|
+| OS | Windows 11 |
+| GPU | NVIDIA RTX 5080 Laptop, 16 GB VRAM, Blackwell sm_120 |
+| CPU | Intel Core Ultra 9 275HX, 24 cores |
+| RAM | 32 GB |
+| Python | 3.10.20 (Anaconda) |
+| PyTorch | 2.11.0+cu128 |
+| CUDA | 12.8 |
+| Ultralytics | 8.4.46 |
 
 ## Setup
 
-### 1. Clone the repository
-
 ```bash
-git clone https://github.com/<your-username>/yolo-aksara-jawa.git
-cd yolo-aksara-jawa
-```
-
-### 2. Create conda environment
-
-```bash
+git clone https://github.com/ericks-rs/yolo-aksara-jawa-dhcd.git
+cd yolo-aksara-jawa-dhcd
 conda create -n yolo-aksara python=3.10 -y
 conda activate yolo-aksara
 pip install -r requirements.txt
 ```
 
-### 3. Obtain datasets
-
-The datasets are NOT included in this repository. See `data/README.md` for instructions on downloading from Kaggle (Aksara Jawa) and the DHCD source (Devanagari).
-
-## Reproduce the Experiments
-
-### Multi-version comparison (YOLOv8 vs YOLO11 vs YOLO26)
-
-```bash
-python scripts/02_train.py --model yolov8n-cls.pt --data <path_to_dataset> --seed 42
-python scripts/02_train.py --model yolo11n-cls.pt --data <path_to_dataset> --seed 42
-python scripts/02_train.py --model yolo26n-cls.pt --data <path_to_dataset> --seed 42
-```
-
-Repeat for seeds `7`, `123`, `999`, `2024`.
-
-### C2PSA ablation
-
-```bash
-python scripts/02_train.py --model configs/yolo26-cls-attn.yaml --data <path_to_dataset> --seed 42
-python scripts/02_train.py --model configs/yolo26-cls-noattn.yaml --data <path_to_dataset> --seed 42
-```
-
-### Generate paper figures
-
-```bash
-python scripts/generate_paper_figures.py
-```
-
-Output figures will be saved to `figures/`.
-
-## Datasets
-
-| Dataset | Classes | Total Images | Source |
-|---------|---------|--------------|--------|
-| Aksara Jawa | 20 | ~2,634 | [Kaggle: phiard/aksara-jawa](https://www.kaggle.com/datasets/phiard/aksara-jawa) |
-| DHCD | 46 | 92,000 | Acharya et al. (2015), SKIMA |
-
-**Note**: The Aksara Jawa Kaggle dataset has a known data leakage issue in its original train/validation split. A corrected splitting protocol is described in the paper (Section 3.3) and implemented in the relevant notebooks.
+Then follow `data/README.md` to obtain the datasets, and run `scripts/clean_split_aksara.py` before using the Aksara Jawa notebooks.
 
 ## Citation
 
-If you use this code or our findings, please cite:
-
 ```bibtex
 @article{swedia2026reassessing,
-  title   = {Reassessing the Role of Attention Mechanisms in YOLO for Character Classification: Multi-Seed Empirical Evidence from Javanese and Devanagari Scripts},
+  title   = {Reassessing the Role of Attention Mechanisms in {YOLO} for
+             Character Classification: Multi-Seed Empirical Evidence from
+             {J}avanese and {D}evanagari Scripts},
   author  = {Swedia, Ericks Rachmat and Trinata, Cakra},
   journal = {Bulletin of Electrical Engineering and Informatics},
   year    = {2026},
-  note    = {Manuscript submitted for publication}
+  note    = {Manuscript under review}
 }
 ```
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+MIT. See [LICENSE](LICENSE).
 
 ## Contact
 
-For questions about the paper or code:
-
-- **Ericks Rachmat Swedia** — ericks_rs@staff.gunadarma.ac.id
-- **Cakra Trinata** — trinatacakra@gmail.com
+- Ericks Rachmat Swedia, ericks_rs@staff.gunadarma.ac.id ([ORCID 0000-0002-9436-0300](https://orcid.org/0000-0002-9436-0300))
+- Cakra Trinata, trinatacakra@gmail.com ([ORCID 0009-0009-6039-5343](https://orcid.org/0009-0009-6039-5343))
