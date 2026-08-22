@@ -19,10 +19,18 @@ Three YOLO generations (YOLOv8n, YOLO11n, YOLO26n) are compared on two Indic scr
 
 ## Key findings
 
-- **No consistent advantage from attention.** ANOVA across the three generations ranges from p = 0.673 down to p = 0.036, and the one significant result favors the pre-attention YOLOv8n.
+- **No consistent advantage from attention.** No architecture generation differs significantly from the others in any of the three settings. Repeated-measures ANOVA returns p values from 0.072 to 0.722.
 - **Removing C2PSA does not hurt, and usually helps.** Cohen's d reaches -1.13 on the Aksara Jawa clean split, a large effect in favor of the attention-free variant.
 - **Attention widens the failure mode.** One with-attention run collapsed mid-training, with validation loss jumping from 0.68 to 20.76 in a single epoch and accuracy falling to 4.30%, below the 5% that random guessing gives on 20 classes. No attention-free run behaves like this. See `figures/fig4_convergence.pdf`.
-- **The public Aksara Jawa split leaks.** Exactly 25.00% of its validation images are augmented variants of images that appear in the training partition. A corrected split is provided.
+- **The public Aksara Jawa split leaks.** Exactly 25.00% of its validation images are augmented variants of images that appear in the training partition, 6 per class across all 20 classes. A corrected split is provided.
+
+Every number above is reproducible from the per-seed CSV files in `results/` without retraining:
+
+```bash
+python scripts/compute_paper_stats.py
+```
+
+The design is within-subjects, since all architectures share the same five seeds, so the omnibus test is a repeated-measures ANOVA. A between-groups ANOVA on the same data gives different values and should not be substituted for it.
 
 ## The data leakage, quantified
 
@@ -110,6 +118,7 @@ python scripts/make_fig4.py                # Figure 4, convergence traces
 │   ├── clean_split_aksara.py          leakage-corrected split
 │   ├── prep_dhcd.py                   DHCD preparation
 │   ├── 02_train.py                    single-run wrapper
+│   ├── compute_paper_stats.py         statistics behind Tables 3 and 4
 │   ├── make_fig4.py                   Figure 4
 │   ├── generate_paper_figures.py      Figures 1 to 3
 │   ├── dump_architecture.py
