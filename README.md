@@ -93,14 +93,34 @@ The reported numbers come from the notebooks, which are the reproduction path:
 
 `scripts/02_train.py` is a single-run convenience wrapper. It did not produce the published results, and its defaults were aligned in August 2026 with the configuration above so that it no longer contradicts them.
 
-Figures are regenerated with:
+Nothing in the paper requires retraining to verify. The statistics, the figures, and
+the leakage measurements are all derived from files already in this repository.
 
 ```bash
-python scripts/generate_paper_figures.py   # Figures 1 to 3
-python scripts/make_fig4.py                # Figure 4, convergence traces
+python scripts/compute_paper_stats.py       # Tables 3 and 4
+python scripts/audit_dataset_leakage.py     # the 25.00% and 0.0435% figures in Section 3.2
+python scripts/generate_paper_figures.py    # Figures 1 and 2
+python scripts/make_fig4.py                 # Figure 3, convergence traces
 ```
 
-`make_fig4.py` reads the per-epoch logs under `runs/ablation_c2psa_clean/`, so it needs no GPU and no retraining.
+`make_fig4.py` reads the per-epoch logs under `runs/ablation_c2psa_clean/`, so it needs
+no GPU. `audit_dataset_leakage.py` needs the datasets in place but does no training.
+
+### Figure numbering
+
+The filenames follow the numbering of the originally submitted manuscript, which had
+four figures. One was removed during revision because the merged ablation table and the
+convergence plot together carried its content. The mapping is therefore:
+
+| Figure in the paper | File |
+|---|---|
+| Figure 1 | `fig1_model_comparison` |
+| Figure 2 | `fig2_ablation` |
+| Figure 3 | `fig4_convergence` |
+| not in the paper | `fig3_training_instability`, per-seed bar chart from the submitted version |
+
+`generate_paper_figures.py` still produces `fig3_training_instability`, which is kept
+for reference rather than deleted.
 
 ## Repository layout
 
@@ -119,6 +139,7 @@ python scripts/make_fig4.py                # Figure 4, convergence traces
 │   ├── prep_dhcd.py                   DHCD preparation
 │   ├── 02_train.py                    single-run wrapper
 │   ├── compute_paper_stats.py         statistics behind Tables 3 and 4
+│   ├── audit_dataset_leakage.py       leakage measurements in Section 3.2
 │   ├── make_fig4.py                   Figure 4
 │   ├── generate_paper_figures.py      Figures 1 to 3
 │   ├── dump_architecture.py
