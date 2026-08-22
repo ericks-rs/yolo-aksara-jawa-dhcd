@@ -1,4 +1,4 @@
-"""Figure 4 for BEEI #13400 Revision 1.
+"""Figure 3 for BEEI #13400 Revision 1.
 
 Answers Reviewer A: "The discussion regarding training instability would also
 be stronger if supported by additional analysis such as convergence behavior
@@ -8,11 +8,11 @@ Reads the per-epoch logs that Ultralytics wrote during the original ablation
 runs on the Aksara Jawa clean split. No retraining is involved, so the curves
 belong to exactly the runs that produced Table 6 in the manuscript.
 
-Source : D:\\Skripsi\\AksaraJawa\\runs\\ablation_c2psa_clean\\{variant}_seed{n}\\results.csv
-Output : fig4_convergence.pdf and .png in this folder
+Source : runs/ablation_c2psa_clean/{variant}_seed{n}/results.csv
+Output : figures/fig3_convergence.pdf and .png
 
 Run:
-    "C:/Users/ERS-ASUS/.conda/envs/yolo-aksara/python.exe" make_fig4.py
+    python scripts/make_fig3.py
 """
 import csv
 import os
@@ -22,8 +22,9 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-RUNS = r"D:\Skripsi\AksaraJawa\runs\ablation_c2psa_clean"
-OUT = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+RUNS = os.path.join(ROOT, "runs", "ablation_c2psa_clean")
+OUT = os.path.join(ROOT, "figures")
 SEEDS = [7, 42, 123, 999, 2024]
 COLLAPSE_SEED = 7
 
@@ -127,7 +128,7 @@ axes[2].annotate(
 
 plt.tight_layout()
 for ext in ("pdf", "png"):
-    p = os.path.join(OUT, f"fig4_convergence.{ext}")
+    p = os.path.join(OUT, f"fig3_convergence.{ext}")
     fig.savefig(p, dpi=300, bbox_inches="tight")
     print("wrote", p)
 

@@ -21,7 +21,7 @@ Three YOLO generations (YOLOv8n, YOLO11n, YOLO26n) are compared on two Indic scr
 
 - **No consistent advantage from attention.** No architecture generation differs significantly from the others in any of the three settings. Repeated-measures ANOVA returns p values from 0.072 to 0.722.
 - **Removing C2PSA does not hurt, and usually helps.** Cohen's d reaches -1.13 on the Aksara Jawa clean split, a large effect in favor of the attention-free variant.
-- **Attention widens the failure mode.** One with-attention run collapsed mid-training, with validation loss jumping from 0.68 to 20.76 in a single epoch and accuracy falling to 4.30%, below the 5% that random guessing gives on 20 classes. No attention-free run behaves like this. See `figures/fig4_convergence.pdf`.
+- **Attention widens the failure mode.** One with-attention run collapsed mid-training, with validation loss jumping from 0.68 to 20.76 in a single epoch and accuracy falling to 4.30%, below the 5% that random guessing gives on 20 classes. No attention-free run behaves like this. See `figures/fig3_convergence.pdf`.
 - **The public Aksara Jawa split leaks.** Exactly 25.00% of its validation images are augmented variants of images that appear in the training partition, 6 per class across all 20 classes. A corrected split is provided.
 
 Every number above is reproducible from the per-seed CSV files in `results/` without retraining:
@@ -100,27 +100,17 @@ the leakage measurements are all derived from files already in this repository.
 python scripts/compute_paper_stats.py       # Tables 3 and 4
 python scripts/audit_dataset_leakage.py     # the 25.00% and 0.0435% figures in Section 3.2
 python scripts/generate_paper_figures.py    # Figures 1 and 2
-python scripts/make_fig4.py                 # Figure 3, convergence traces
+python scripts/make_fig3.py                 # Figure 3, convergence traces
 ```
 
-`make_fig4.py` reads the per-epoch logs under `runs/ablation_c2psa_clean/`, so it needs
-no GPU. `audit_dataset_leakage.py` needs the datasets in place but does no training.
+Figure filenames match the figure numbers in the paper. `make_fig3.py` reads the
+per-epoch logs under `runs/ablation_c2psa_clean/`, so it needs no GPU and no dataset.
+`audit_dataset_leakage.py` needs the datasets in place but does no training.
 
-### Figure numbering
-
-The filenames follow the numbering of the originally submitted manuscript, which had
-four figures. One was removed during revision because the merged ablation table and the
-convergence plot together carried its content. The mapping is therefore:
-
-| Figure in the paper | File |
-|---|---|
-| Figure 1 | `fig1_model_comparison` |
-| Figure 2 | `fig2_ablation` |
-| Figure 3 | `fig4_convergence` |
-| not in the paper | `fig3_training_instability`, per-seed bar chart from the submitted version |
-
-`generate_paper_figures.py` still produces `fig3_training_instability`, which is kept
-for reference rather than deleted.
+`figures/superseded/` holds one figure that appeared in the originally submitted version
+and was dropped during revision, a per-seed bar chart whose content is now carried by the
+ablation table and by Figure 3. Set `KEEP_SUPERSEDED = True` in
+`generate_paper_figures.py` to regenerate it.
 
 ## Repository layout
 
@@ -140,8 +130,8 @@ for reference rather than deleted.
 │   ├── 02_train.py                    single-run wrapper
 │   ├── compute_paper_stats.py         statistics behind Tables 3 and 4
 │   ├── audit_dataset_leakage.py       leakage measurements in Section 3.2
-│   ├── make_fig4.py                   Figure 4
-│   ├── generate_paper_figures.py      Figures 1 to 3
+│   ├── make_fig3.py                   Figure 3
+│   ├── generate_paper_figures.py      Figures 1 and 2
 │   ├── dump_architecture.py
 │   └── export_kernels_txt.py
 │
@@ -157,7 +147,7 @@ for reference rather than deleted.
 │
 ├── results/                           per-seed summary tables behind the paper tables
 │
-├── figures/                           Figures 1 to 4, PNG and PDF
+├── figures/                           Figures 1 to 3, PNG and PDF
 │
 └── data/README.md                     how to obtain the datasets
 ```

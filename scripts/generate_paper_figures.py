@@ -6,13 +6,19 @@ PNG + PDF figures to ../figures/.
 Output figures:
   - fig1_model_comparison.png      : YOLOv8/11/26 across 3 datasets (box plot)
   - fig2_ablation.png              : C2PSA on/off comparison (Aksara clean + DHCD)
-  - fig3_training_instability.png  : Per-seed bars showing seed=7 collapse
+  - fig3_training_instability.png  : per-seed bars, IN THE SUBMITTED VERSION ONLY.
+                                     Dropped during revision, since the merged
+                                     ablation table and the convergence plot in
+                                     fig3_convergence carry the same information.
+                                     Set KEEP_SUPERSEDED below to regenerate it.
 
 Usage:
     python scripts/generate_paper_figures.py
 """
 from pathlib import Path
 import pandas as pd
+KEEP_SUPERSEDED = False  # the paper no longer has this figure
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -145,9 +151,12 @@ for bars in [b1, b2]:
                 ha='center', va='bottom', fontsize=8)
 
 plt.tight_layout()
-plt.savefig(OUT / 'fig3_training_instability.png', dpi=300, bbox_inches='tight')
-plt.savefig(OUT / 'fig3_training_instability.pdf', bbox_inches='tight')
-plt.close()
-print('Saved fig3_training_instability')
+if KEEP_SUPERSEDED:
+    plt.savefig(OUT / 'fig3_training_instability.png', dpi=300, bbox_inches='tight')
+    plt.savefig(OUT / 'fig3_training_instability.pdf', bbox_inches='tight')
+    plt.close()
+    print('Saved fig3_training_instability (superseded, not in the paper)')
+else:
+    plt.close()
 
 print(f'\nAll figures saved to: {OUT}')
