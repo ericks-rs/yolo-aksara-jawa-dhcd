@@ -15,7 +15,7 @@ Two conventions matter and are applied uniformly here:
       same five seeds, so the design is within-subjects and the seed is the
       subject factor. A between-groups one-way ANOVA on the same data gives
       noticeably different values, for instance F = 4.449 and p = 0.036 on the
-      Aksara Jawa clean split against F = 3.736 and p = 0.072 for the
+      Aksara Jawa clean split against F = 3.736 and p = 0.071 for the
       repeated-measures test, so the distinction is not cosmetic.
 
   Cohen's d
