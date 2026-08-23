@@ -20,6 +20,11 @@ import pandas as pd
 KEEP_SUPERSEDED = False  # the paper no longer has this figure
 
 import matplotlib.pyplot as plt
+
+# Embed text as TrueType (42) rather than matplotlib's default Type 3.
+# Type 3 text cannot be selected reliably and some publishers reject it.
+plt.rcParams['pdf.fonttype'] = 42
+plt.rcParams['ps.fonttype'] = 42
 import numpy as np
 
 # Resolve project root (parent of this script's parent)

@@ -22,6 +22,11 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+# Embed text as TrueType (42) rather than matplotlib's default Type 3.
+# Type 3 text cannot be selected reliably and some publishers reject it.
+plt.rcParams['pdf.fonttype'] = 42
+plt.rcParams['ps.fonttype'] = 42
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RUNS = os.path.join(ROOT, "runs", "ablation_c2psa_clean")
 OUT = os.path.join(ROOT, "figures")
