@@ -1,0 +1,57 @@
+cff-version: 1.2.0
+title: >-
+  Reassessing the Role of Attention Mechanisms in YOLO for
+  Character Classification
+message: >-
+  If you use this code, the corrected Aksara Jawa split, or the per-seed
+  results, please cite the article below rather than the repository.
+type: software
+authors:
+  - given-names: Ericks Rachmat
+    family-names: Swedia
+    email: ericks_rs@staff.gunadarma.ac.id
+    orcid: 'https://orcid.org/0000-0002-9436-0300'
+    affiliation: >-
+      Department of Informatics Engineering, Faculty of Industrial
+      Technology, Gunadarma University, Depok, Jawa Barat, Indonesia
+  - given-names: Cakra
+    family-names: Trinata
+    email: trinatacakra@gmail.com
+    orcid: 'https://orcid.org/0009-0009-6039-5343'
+    affiliation: >-
+      Department of Immigration, Study Program in Immigration Technology
+      Management, Politeknik Imigrasi dan Pemasyarakatan Indonesia,
+      Tangerang, Banten, Indonesia
+repository-code: 'https://github.com/ericks-rs/yolo-aksara-jawa-dhcd'
+abstract: >-
+  Code, per-run configuration files, per-epoch training logs, and per-seed
+  results for a study asking whether the C2PSA attention block in modern
+  YOLO releases earns its place on isolated character classification. The
+  repository also contains the leakage-corrected split for the public
+  Aksara Jawa dataset, in which 25.00 percent of the distributed
+  validation images are augmented variants of training images.
+keywords:
+  - YOLO
+  - attention mechanism
+  - character classification
+  - Javanese script
+  - Devanagari
+  - ablation study
+  - data leakage
+license: MIT
+preferred-citation:
+  type: article
+  title: >-
+    Reassessing the role of attention mechanisms in YOLO for character
+    classification: multi-seed empirical evidence from Javanese and
+    Devanagari scripts
+  authors:
+    - given-names: Ericks Rachmat
+      family-names: Swedia
+      orcid: 'https://orcid.org/0000-0002-9436-0300'
+    - given-names: Cakra
+      family-names: Trinata
+      orcid: 'https://orcid.org/0009-0009-6039-5343'
+  journal: Bulletin of Electrical Engineering and Informatics
+  year: 2026
+  notes: Manuscript under review, submission 13400
