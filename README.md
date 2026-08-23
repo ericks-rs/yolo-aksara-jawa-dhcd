@@ -1,21 +1,21 @@
-# Reassessing the Role of Attention Mechanisms in YOLO for Character Classification
+# Reassessing attention mechanisms in YOLO for Javanese and Devanagari character classification
 
 Source code, experiment logs, and per-seed results for the paper:
 
-> **Reassessing the Role of Attention Mechanisms in YOLO for Character Classification: Multi-Seed Empirical Evidence from Javanese and Devanagari Scripts**
+> **Reassessing attention mechanisms in YOLO for Javanese and Devanagari character classification**
 >
 > Ericks Rachmat Swedia¹, Cakra Trinata²
 >
 > ¹Department of Informatics Engineering, Faculty of Industrial Technology, Gunadarma University, Depok, Jawa Barat, Indonesia
 > ²Department of Immigration, Study Program in Immigration Technology Management, Politeknik Imigrasi dan Pemasyarakatan Indonesia, Tangerang, Banten, Indonesia
 >
-> Under review at *Bulletin of Electrical Engineering and Informatics (BEEI)*, submission 13400
+> Submitted to *Bulletin of Electrical Engineering and Informatics (BEEI)*, submission 13400. Major revision returned 22 August 2026, revised version prepared.
 
 ## Overview
 
 Modern YOLO releases have added attention to the backbone, and YOLO11 and YOLO26 both carry a C2PSA spatial attention block that YOLOv8 does not have. This study asks whether that block earns its place when the task is isolated character classification, where a single glyph sits on a near-empty background.
 
-Three YOLO generations (YOLOv8n, YOLO11n, YOLO26n) are compared on two scripts, Javanese (Aksara Jawa) and Devanagari (DHCD), with five seeds per configuration, followed by a direct ablation that removes the C2PSA block and replaces it with a structurally similar C3k2 block. Across every setting the attention-equipped variants show no consistent advantage, and on the smaller dataset the attention block makes training measurably less stable.
+Three YOLO generations (YOLOv8n, YOLO11n, YOLO26n) are compared on two scripts, Javanese (Aksara Jawa) and Devanagari (DHCD), with five seeds per configuration, followed by an ablation that replaces the C2PSA block with a C3k2 block. Across every setting the attention-equipped variants show no consistent advantage, and on the smaller dataset the attention block makes training measurably less stable.
 
 ## Key findings
 
@@ -240,13 +240,12 @@ Then follow `data/README.md` to obtain the datasets, and run `scripts/clean_spli
 
 ```bibtex
 @article{swedia2026reassessing,
-  title   = {Reassessing the Role of Attention Mechanisms in {YOLO} for
-             Character Classification: Multi-Seed Empirical Evidence from
-             {J}avanese and {D}evanagari Scripts},
+  title   = {Reassessing attention mechanisms in {YOLO} for {J}avanese and
+             {D}evanagari character classification},
   author  = {Swedia, Ericks Rachmat and Trinata, Cakra},
   journal = {Bulletin of Electrical Engineering and Informatics},
   year    = {2026},
-  note    = {Manuscript under review}
+  note    = {Manuscript in revision}
 }
 ```
 
