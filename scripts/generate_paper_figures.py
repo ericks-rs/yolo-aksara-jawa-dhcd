@@ -53,8 +53,11 @@ for df in [df_naive, df_clean, df_dhcd, df_abl_aks, df_abl_dh]:
 MODEL_LABELS = {'yolov8n': 'YOLOv8n', 'yolo11n': 'YOLO11n', 'yolo26n': 'YOLO26n'}
 MODEL_COLORS = {'yolov8n': '#2E86AB', 'yolo11n': '#A23B72', 'yolo26n': '#F18F01'}
 
+# Fixed generator for the scatter jitter, so the figures redraw identically.
+JITTER = np.random.RandomState(42)
+
 # ========== FIGURE 1: 3-Model Comparison (Box plot) ==========
-fig, axes = plt.subplots(1, 3, figsize=(13, 4.2), sharey=False)
+fig, axes = plt.subplots(1, 3, figsize=(13, 5.4), sharey=False)
 datasets = [
     ('Aksara Jawa (Naive)', df_naive),
     ('Aksara Jawa (Clean)', df_clean),
@@ -75,7 +78,7 @@ for ax, (title, df) in zip(axes, datasets):
     # Overlay scatter (per-seed dots)
     for i, m in enumerate(['yolov8n', 'yolo11n', 'yolo26n']):
         y = df[df['model'] == m]['top1_pct'].values
-        x = np.full_like(y, i + 1, dtype=float) + np.random.uniform(-0.08, 0.08, len(y))
+        x = np.full_like(y, i + 1, dtype=float) + JITTER.uniform(-0.08, 0.08, len(y))
         ax.scatter(x, y, color='black', s=18, zorder=10, alpha=0.7)
 
 plt.tight_layout()
@@ -108,7 +111,7 @@ for ax, (title, df) in zip(axes, ablation_data):
     ax.grid(True, alpha=0.3, axis='y')
     # Per-seed scatter
     for i, vals in enumerate([attn, noattn]):
-        x = np.full_like(vals, i + 1, dtype=float) + np.random.uniform(-0.06, 0.06, len(vals))
+        x = np.full_like(vals, i + 1, dtype=float) + JITTER.uniform(-0.06, 0.06, len(vals))
         ax.scatter(x, vals, color='black', s=20, zorder=10, alpha=0.75)
 
 plt.tight_layout()

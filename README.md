@@ -15,7 +15,7 @@ Source code, experiment logs, and per-seed results for the paper:
 
 Modern YOLO releases have added attention to the backbone, and YOLO11 and YOLO26 both carry a C2PSA spatial attention block that YOLOv8 does not have. This study asks whether that block earns its place when the task is isolated character classification, where a single glyph sits on a near-empty background.
 
-Three YOLO generations (YOLOv8n, YOLO11n, YOLO26n) are compared on two Indic scripts, Javanese (Aksara Jawa) and Devanagari (DHCD), with five seeds per configuration, followed by a direct ablation that removes the C2PSA block and replaces it with a structurally similar C3k2 block. Across every setting the attention-equipped variants show no consistent advantage, and on the smaller dataset the attention block makes training measurably less stable.
+Three YOLO generations (YOLOv8n, YOLO11n, YOLO26n) are compared on two scripts, Javanese (Aksara Jawa) and Devanagari (DHCD), with five seeds per configuration, followed by a direct ablation that removes the C2PSA block and replaces it with a structurally similar C3k2 block. Across every setting the attention-equipped variants show no consistent advantage, and on the smaller dataset the attention block makes training measurably less stable.
 
 ## Key findings
 
