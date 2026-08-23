@@ -129,7 +129,7 @@ axes[2].annotate(
 plt.tight_layout()
 for ext in ("pdf", "png"):
     p = os.path.join(OUT, f"fig3_convergence.{ext}")
-    fig.savefig(p, dpi=300, bbox_inches="tight")
+    fig.savefig(p, dpi=600, bbox_inches="tight")
     print("wrote", p)
 
 # numbers quoted in the caption and the body text, printed so they can be

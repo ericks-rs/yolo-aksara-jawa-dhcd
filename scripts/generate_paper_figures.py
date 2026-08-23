@@ -76,7 +76,7 @@ for ax, (title, df) in zip(axes, datasets):
 fig.suptitle('YOLO Generation Comparison Across Datasets (5 seeds per configuration)',
              fontsize=12, y=1.02)
 plt.tight_layout()
-plt.savefig(OUT / 'fig1_model_comparison.png', dpi=300, bbox_inches='tight')
+plt.savefig(OUT / 'fig1_model_comparison.png', dpi=600, bbox_inches='tight')
 plt.savefig(OUT / 'fig1_model_comparison.pdf', bbox_inches='tight')
 plt.close()
 print('Saved fig1_model_comparison')
@@ -111,7 +111,7 @@ for ax, (title, df) in zip(axes, ablation_data):
 fig.suptitle('C2PSA Attention Block Ablation (5 seeds, from scratch)',
              fontsize=12, y=1.02)
 plt.tight_layout()
-plt.savefig(OUT / 'fig2_ablation.png', dpi=300, bbox_inches='tight')
+plt.savefig(OUT / 'fig2_ablation.png', dpi=600, bbox_inches='tight')
 plt.savefig(OUT / 'fig2_ablation.pdf', bbox_inches='tight')
 plt.close()
 print('Saved fig2_ablation')
@@ -152,7 +152,7 @@ for bars in [b1, b2]:
 
 plt.tight_layout()
 if KEEP_SUPERSEDED:
-    plt.savefig(OUT / 'fig3_training_instability.png', dpi=300, bbox_inches='tight')
+    plt.savefig(OUT / 'fig3_training_instability.png', dpi=600, bbox_inches='tight')
     plt.savefig(OUT / 'fig3_training_instability.pdf', bbox_inches='tight')
     plt.close()
     print('Saved fig3_training_instability (superseded, not in the paper)')
