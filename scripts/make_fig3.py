@@ -53,7 +53,7 @@ def read_curve(variant, seed):
 
 data = {v: {s: read_curve(v, s) for s in SEEDS} for v in ("attn", "noattn")}
 
-fig, axes = plt.subplots(1, 3, figsize=(13.5, 3.9))
+fig, axes = plt.subplots(1, 3, figsize=(13.5, 5.4))
 
 panels = [
     (0, 1, "Training loss", "Training loss"),
