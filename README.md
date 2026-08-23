@@ -22,7 +22,7 @@ Three YOLO generations (YOLOv8n, YOLO11n, YOLO26n) are compared on two Indic scr
 - **No consistent advantage from attention.** No architecture generation differs significantly from the others in any of the three settings. Repeated-measures ANOVA returns p values from 0.071 to 0.722.
 - **Removing C2PSA does not hurt, and usually helps.** Cohen's d reaches -1.13 on the Aksara Jawa clean split, a large effect in favor of the attention-free variant.
 - **Attention widens the failure mode.** One with-attention run collapsed mid-training, with validation loss jumping from 0.68 to 20.76 in a single epoch and accuracy falling to 4.30%, below the 5% that random guessing gives on 20 classes. No attention-free run behaves like this. See `figures/fig3_convergence.pdf`.
-- **The public Aksara Jawa split leaks.** Exactly 25.00% of its validation images are augmented variants of images that appear in the training partition, 6 per class across all 20 classes. A corrected split is provided.
+- **The public Aksara Jawa split leaks.** Exactly 25% of its validation images are augmented variants of images that appear in the training partition, 6 per class across all 20 classes. A corrected split is provided.
 
 Every number above is reproducible from the per-seed CSV files in `results/` without retraining:
 
@@ -43,7 +43,7 @@ Measured on the distributed split:
 | Train images | 2,154 | 2,076 |
 | Validation images | 480 | 558 |
 | Base IDs shared between train and val | 20 of 399 | **0 of 399** |
-| **Validation images that leak** | **120 of 480 (25.00%)** | **0** |
+| **Validation images that leak** | **120 of 480 (25%)** | **0** |
 | Leaked images per class | 6, uniform across all 20 classes | 0 |
 
 The correction groups every augmented variant of one base image into a single partition, then splits at the level of base IDs rather than files, holding out roughly 20% of base IDs per class with a fixed shuffle seed of 42. Run it with:
@@ -134,7 +134,8 @@ the leakage measurements are all derived from files already in this repository.
 
 ```bash
 python scripts/compute_paper_stats.py       # Tables 3 and 4
-python scripts/audit_dataset_leakage.py     # the 25.00% and 0.0435% figures in Section 3.2
+python scripts/audit_dataset_leakage.py     # the 25% and 0.0435% figures in Section 3.2
+python scripts/audit_log_consistency.py     # published accuracies against the training logs
 python scripts/generate_paper_figures.py    # Figures 1 and 2
 python scripts/make_fig3.py                 # Figure 3, convergence traces
 ```
@@ -147,6 +148,16 @@ per-epoch logs under `runs/ablation_c2psa_clean/`, so it needs no GPU and no dat
 and was dropped during revision, a per-seed bar chart whose content is now carried by the
 ablation table and by Figure 3. Set `KEEP_SUPERSEDED = True` in
 `generate_paper_figures.py` to regenerate it.
+
+### Reported accuracies versus the per-epoch logs
+
+Each reported accuracy comes from a full-precision validation of `best.pt` run after
+training finished, while `runs/*/results.csv` logs the mixed-precision validation
+performed during training. The weights are identical, the arithmetic is not. Across the
+60 runs that kept per-epoch logs the two agree exactly for 48, and differ elsewhere by at
+most three images out of the validation set, in both directions. That is what borderline
+samples changing class between FP16 and FP32 inference looks like. The aggregate CSVs
+under `results/` are the source of every number printed in the paper.
 
 ## Repository layout
 
@@ -166,6 +177,7 @@ ablation table and by Figure 3. Set `KEEP_SUPERSEDED = True` in
 │   ├── 02_train.py                    single-run wrapper
 │   ├── compute_paper_stats.py         statistics behind Tables 3 and 4
 │   ├── audit_dataset_leakage.py       leakage measurements in Section 3.2
+│   ├── audit_log_consistency.py       published accuracies vs training logs
 │   ├── make_fig3.py                   Figure 3
 │   ├── generate_paper_figures.py      Figures 1 and 2
 │   ├── dump_architecture.py

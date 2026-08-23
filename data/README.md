@@ -28,7 +28,7 @@ The datasets used in this study are NOT included in this repository due to their
 
 The original train/validation split provided in this dataset contains data leakage. Augmented variants of the same base image (denoted by filename suffixes such as `.r10`, `.rm10`, `.b`, and `.meki`) appear in both training and validation sets.
 
-Measured on the distributed split, exactly 120 of the 480 validation images (25.00%) are augmented variants of an image that also appears in training, spread uniformly at 6 images per class across all 20 classes.
+Measured on the distributed split, exactly 120 of the 480 validation images (25%) are augmented variants of an image that also appears in training, spread uniformly at 6 images per class across all 20 classes.
 
 The corrected split is implemented in `scripts/clean_split_aksara.py`, which groups every variant of one base image into a single partition and then splits at the level of base IDs. Run it before using the Aksara Jawa notebooks. We strongly recommend the corrected split for any comparative model evaluation.
 

@@ -4,7 +4,7 @@ Section 3.2 of the paper states two quantities that a reader should be able
 to check without training anything:
 
   Aksara Jawa, distributed split
-      120 of 480 validation images (25.00 percent) are augmented variants of
+      120 of 480 validation images (25 percent) are augmented variants of
       an image that also appears in training, 6 in each of the 20 classes,
       arising from 20 of the 399 base identifiers being split across both
       partitions. The corrected split brings this to zero.
@@ -13,8 +13,9 @@ to check without training anything:
       8 of 18,400 validation images (0.0435 percent) are pixel-identical
       copies of a training image, all inside the class character_15_adna and
       all inherited from the source collection rather than introduced by our
-      split. They are left in place, since a rate roughly 575 times lower
-      than the one corrected in Aksara Jawa cannot affect any comparison.
+      split. They are left in place. The rate is roughly 575 times lower
+      than the one corrected in Aksara Jawa, but very small accuracy
+      differences on DHCD should still be interpreted with caution.
 
 The Aksara Jawa check groups files by the base identifier encoded in the
 filename. The DHCD check compares MD5 hashes of the image bytes, because
