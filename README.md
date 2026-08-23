@@ -56,7 +56,14 @@ Absolute accuracy is not comparable across the two splits, because regrouping ch
 
 ## Training configuration actually used
 
-Every value below is recorded in the published `runs/<experiment>/<run>/args.yaml` files and in the training logs preserved in the notebook outputs.
+Every value below is recorded in the published `runs/<experiment>/<run>/args.yaml` files
+and in the training logs preserved in the notebook outputs.
+
+**Read the table knowing that we chose almost none of it.** The only training decisions we
+made were `optimizer='auto'`, the image size, and the batch size. Everything else, including
+which optimizer family is used, the learning rate, and the weight decay, is derived by
+Ultralytics from those choices and from the size of the dataset. The two datasets therefore
+end up with different settings while having been given identical treatment.
 
 | | Aksara Jawa | DHCD |
 |---|---|---|
@@ -72,13 +79,42 @@ Every value below is recorded in the published `runs/<experiment>/<run>/args.yam
 | Augmentation | Ultralytics classification default, identical for every model | same |
 | Seeds | 7, 42, 123, 999, 2024 | same |
 
-Two points are worth reading carefully.
+Three points are worth reading carefully.
 
 **`args.yaml` does not show the effective optimizer.** It records `lr0: 0.01` and `momentum: 0.937`, which are the Ultralytics defaults as passed in. Because `optimizer='auto'` was used, the framework discarded those and picked its own, printing the choice to the training log. The effective values are the ones in the table above.
 
 **Augmentation was on, not off.** The default Ultralytics classification pipeline was active (`auto_augment=randaugment`, `erasing=0.4`, `fliplr=0.5`, `scale=0.5`). It was applied identically to every architecture, so it cannot favor any of them, but it was not disabled.
 
-The multi-version comparison used ImageNet pretrained weights. The ablation runs build from a `.yaml` config, so they start from random initialization.
+**The two datasets differ because they are different sizes, not because we tuned them.**
+Under `optimizer='auto'` Ultralytics decides as follows, in `engine/trainer.py`:
+
+```python
+accumulate    = max(round(nbs / batch_size), 1)              # nbs = 64
+weight_decay  = weight_decay * batch_size * accumulate / nbs
+lr_fit        = round(0.002 * 5 / (4 + nc), 6)               # nc = number of classes
+name, lr, momentum = ("MuSGD", 0.01, 0.9) if iterations > 10000 else ("AdamW", lr_fit, 0.9)
+```
+
+Substituting our two datasets:
+
+| | Aksara Jawa | DHCD |
+|---|---|---|
+| Optimizer iterations | 2,076 / 64 x 50 = **1,622** | 73,600 / 128 x 50 = **28,750** |
+| Above the 10,000 threshold | no, so AdamW | yes, so MuSGD |
+| Learning rate | 0.002 x 5 / (4 + 20) = **0.000417** | fixed at **0.01** for MuSGD |
+| Weight decay | 0.0005 x 64 x 1 / 64 = **0.0005** | 0.0005 x 128 x 1 / 64 = **0.001** |
+
+Image size follows each dataset's native resolution. DHCD is distributed at 32 x 32, so 32 is
+its native size rather than a reduction. The Aksara Jawa images are 224 x 224 and were
+downscaled to 128.
+
+None of this affects the comparisons, because every comparison in the paper is made **within**
+one dataset. All three architectures on Aksara Jawa share the same AdamW at lr 0.000417, and
+both ablation variants on DHCD share the same MuSGD at lr 0.01. The across-dataset difference
+never enters a statistical test.
+
+The multi-version comparison used ImageNet pretrained weights. The ablation runs build from a
+`.yaml` config, so they start from random initialization.
 
 ## Reproducing the results
 
