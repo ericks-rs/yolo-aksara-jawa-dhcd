@@ -131,7 +131,8 @@ axes[2].annotate(
     arrowprops=dict(arrowstyle="->", color=COLLAPSE_C, linewidth=0.9),
 )
 
-plt.tight_layout()
+# extra horizontal padding so the panels read as separate charts
+plt.tight_layout(w_pad=3.5)
 for ext in ("pdf", "png"):
     p = os.path.join(OUT, f"fig3_convergence.{ext}")
     fig.savefig(p, dpi=600, bbox_inches="tight")

@@ -83,7 +83,8 @@ for ax, (title, df) in zip(axes, datasets):
         x = np.full_like(y, i + 1, dtype=float) + JITTER.uniform(-0.08, 0.08, len(y))
         ax.scatter(x, y, color='black', s=18, zorder=10, alpha=0.7)
 
-plt.tight_layout()
+# extra horizontal padding so the three panels read as separate charts
+plt.tight_layout(w_pad=3.5)
 plt.savefig(OUT / 'fig1_model_comparison.png', dpi=600, bbox_inches='tight')
 plt.savefig(OUT / 'fig1_model_comparison.pdf', bbox_inches='tight')
 plt.close()
@@ -116,7 +117,8 @@ for ax, (title, df) in zip(axes, ablation_data):
         x = np.full_like(vals, i + 1, dtype=float) + JITTER.uniform(-0.06, 0.06, len(vals))
         ax.scatter(x, vals, color='black', s=20, zorder=10, alpha=0.75)
 
-plt.tight_layout()
+# extra horizontal padding so the panels read as separate charts
+plt.tight_layout(w_pad=3.5)
 plt.savefig(OUT / 'fig2_ablation.png', dpi=600, bbox_inches='tight')
 plt.savefig(OUT / 'fig2_ablation.pdf', bbox_inches='tight')
 plt.close()
