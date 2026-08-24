@@ -66,7 +66,9 @@ datasets = [
 
 for ax, (title, df) in zip(axes, datasets):
     data = [df[df['model'] == m]['top1_pct'].values for m in ['yolov8n', 'yolo11n', 'yolo26n']]
-    bp = ax.boxplot(data, patch_artist=True, widths=0.55,
+    # every seed is drawn by the scatter below, so the default flier markers
+    # would render the extreme runs twice and imply extra observations
+    bp = ax.boxplot(data, patch_artist=True, widths=0.55, showfliers=False,
                      medianprops=dict(color='black', linewidth=1.2))
     for patch, m in zip(bp['boxes'], ['yolov8n', 'yolo11n', 'yolo26n']):
         patch.set_facecolor(MODEL_COLORS[m])
@@ -99,7 +101,7 @@ for ax, (title, df) in zip(axes, ablation_data):
     attn = df[df['variant'] == 'attn']['top1_pct'].values
     noattn = df[df['variant'] == 'noattn']['top1_pct'].values
 
-    bp = ax.boxplot([attn, noattn], patch_artist=True, widths=0.55,
+    bp = ax.boxplot([attn, noattn], patch_artist=True, widths=0.55, showfliers=False,
                      medianprops=dict(color='black', linewidth=1.2))
     bp['boxes'][0].set_facecolor('#C73E1D')  # red-ish for attn
     bp['boxes'][1].set_facecolor('#3D8B37')  # green for no-attn
