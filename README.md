@@ -7,24 +7,25 @@ Source code, experiment logs, and per-seed results for the paper:
 > Ericks Rachmat Swedia¹, Cakra Trinata²
 >
 > ¹Department of Informatics Engineering, Faculty of Industrial Technology, Gunadarma University, Depok, Jawa Barat, Indonesia
-> ²Department of Immigration, Study Program in Immigration Technology Management, Politeknik Imigrasi dan Pemasyarakatan Indonesia, Tangerang, Banten, Indonesia
+> ²Department of Immigration, Study Program in Immigration Technology Management, Indonesian Immigration and Corrections Polytechnic, Tangerang, Banten, Indonesia
 >
 > Submitted to *Bulletin of Electrical Engineering and Informatics (BEEI)*, submission 13400. Major revision returned 22 August 2026, revised version prepared.
 
 ## Overview
 
-Modern YOLO releases have added attention to the backbone, and YOLO11 and YOLO26 both carry a C2PSA spatial attention block that YOLOv8 does not have. This study asks whether that block earns its place when the task is isolated character classification, where a single glyph sits on a near-empty background.
+Modern YOLO releases have added attention to the backbone, and YOLO11 and YOLO26 both carry a C2PSA spatial attention block that YOLOv8 does not have. This study asks whether that block improves isolated character classification, where each image contains one centered glyph on a mostly empty background.
 
-Three YOLO generations (YOLOv8n, YOLO11n, YOLO26n) are compared on two scripts, Javanese (Aksara Jawa) and Devanagari (DHCD), with five seeds per configuration, followed by an ablation that replaces the C2PSA block with a C3k2 block. Across every setting the attention-equipped variants show no consistent advantage, and on the smaller dataset the attention block makes training measurably less stable.
+Three YOLO generations (YOLOv8n, YOLO11n, YOLO26n) are compared on two scripts, Javanese (Aksara Jawa) and Devanagari (DHCD), with five seeds per configuration, followed by an ablation that replaces the C2PSA block with a C3k2 block. In none of the settings did the attention-equipped models show a consistent advantage, and on the smaller dataset C2PSA was associated with greater training variation across seeds under the tested protocol.
 
 ## Key findings
 
-- **No consistent advantage from attention.** No architecture generation differs significantly from the others in any of the three settings. Repeated-measures ANOVA returns p values from 0.071 to 0.722.
-- **Removing C2PSA does not hurt, and usually helps.** Cohen's d reaches -1.13 on the Aksara Jawa clean split, a large effect in favor of the attention-free variant.
-- **Attention widens the failure mode.** One with-attention run collapsed mid-training, with validation loss jumping from 0.68 to 20.76 in a single epoch and accuracy falling to 4.30%, below the 5% that random guessing gives on 20 classes. No attention-free run behaves like this. See `figures/fig3_convergence.pdf`.
+- **No statistically significant overall difference among the three generations.** Repeated-measures ANOVA gave p = 0.722 (Aksara Jawa naive split), p = 0.071 (Aksara Jawa clean split), and p = 0.114 (DHCD). On the clean Aksara Jawa split, YOLOv8n achieved the highest mean accuracy (99.35%) and the smallest standard deviation across seeds (0.10 percentage points).
+- **C2PSA did not provide a consistent accuracy advantage.** On the Aksara Jawa clean split the variant without C2PSA achieved 95.63% against 91.97% with C2PSA. The paired difference was not statistically significant (p = 0.166), but Cohen's d = -1.13 indicates a large effect favoring the variant without C2PSA. On DHCD the two variants differed by 0.02 percentage points.
+- **C2PSA was associated with greater training variation under the tested protocol.** One C2PSA run collapsed at epoch 20, with validation loss rising from 0.68 to 20.76 and validation accuracy falling to 4.30%, below the 5% expected from random classification across 20 classes. The standard deviation across seeds was 4.25 percentage points with C2PSA against 1.71 without. See `figures/fig3_convergence.pdf`.
+- **YOLOv8n trained fastest.** YOLO26n required 39.31% more training time than YOLOv8n on DHCD for an accuracy difference of 0.08 percentage points. Removing C2PSA alone did not reduce training time in the ablation, so the efficiency difference belongs to the model generation rather than to the attention block.
 - **The public Aksara Jawa split leaks.** Exactly 25% of its validation images are augmented variants of images that appear in the training partition, 6 per class across all 20 classes. A corrected split is provided.
 
-Every number above is reproducible from the per-seed CSV files in `results/` without retraining:
+Every number above is reproducible without retraining, from the per-seed CSV files in `results/` and the per-epoch logs in `runs/`:
 
 ```bash
 python scripts/compute_paper_stats.py
@@ -256,4 +257,4 @@ MIT. See [LICENSE](LICENSE).
 ## Contact
 
 - Ericks Rachmat Swedia, ericks_rs@staff.gunadarma.ac.id ([ORCID 0000-0002-9436-0300](https://orcid.org/0000-0002-9436-0300))
-- Cakra Trinata, trinatacakra@gmail.com ([ORCID 0009-0009-6039-5343](https://orcid.org/0009-0009-6039-5343))
+- Cakra Trinata, cakra.trinata@poltekim.ac.id ([ORCID 0009-0009-6039-5343](https://orcid.org/0009-0009-6039-5343))

@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 title: >-
-  Reassessing the Role of Attention Mechanisms in YOLO for
-  Character Classification
+  Reassessing attention mechanisms in YOLO for Javanese and
+  Devanagari character classification
 message: >-
   If you use this code, the corrected Aksara Jawa split, or the per-seed
   results, please cite the article below rather than the repository.
@@ -16,11 +16,11 @@ authors:
       Technology, Gunadarma University, Depok, Jawa Barat, Indonesia
   - given-names: Cakra
     family-names: Trinata
-    email: trinatacakra@gmail.com
+    email: cakra.trinata@poltekim.ac.id
     orcid: 'https://orcid.org/0009-0009-6039-5343'
     affiliation: >-
       Department of Immigration, Study Program in Immigration Technology
-      Management, Politeknik Imigrasi dan Pemasyarakatan Indonesia,
+      Management, Indonesian Immigration and Corrections Polytechnic,
       Tangerang, Banten, Indonesia
 repository-code: 'https://github.com/ericks-rs/yolo-aksara-jawa-dhcd'
 abstract: >-
@@ -42,9 +42,8 @@ license: MIT
 preferred-citation:
   type: article
   title: >-
-    Reassessing the role of attention mechanisms in YOLO for character
-    classification: multi-seed empirical evidence from Javanese and
-    Devanagari scripts
+    Reassessing attention mechanisms in YOLO for Javanese and
+    Devanagari character classification
   authors:
     - given-names: Ericks Rachmat
       family-names: Swedia
@@ -54,4 +53,4 @@ preferred-citation:
       orcid: 'https://orcid.org/0009-0009-6039-5343'
   journal: Bulletin of Electrical Engineering and Informatics
   year: 2026
-  notes: Manuscript under review, submission 13400
+  notes: Manuscript in revision, submission 13400

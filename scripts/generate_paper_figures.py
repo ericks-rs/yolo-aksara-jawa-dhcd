@@ -57,7 +57,9 @@ MODEL_COLORS = {'yolov8n': '#2E86AB', 'yolo11n': '#A23B72', 'yolo26n': '#F18F01'
 JITTER = np.random.RandomState(42)
 
 # ========== FIGURE 1: 3-Model Comparison (Box plot) ==========
-fig, axes = plt.subplots(1, 3, figsize=(13, 5.4), sharey=False)
+# (13, 4.2) is the aspect used in the paper: at the 11 cm print width it leaves
+# room for Table 3 under the figure on the same page. (13, 5.4) did not.
+fig, axes = plt.subplots(1, 3, figsize=(13, 4.2), sharey=False)
 datasets = [
     ('Aksara Jawa (Naive)', df_naive),
     ('Aksara Jawa (Clean)', df_clean),
