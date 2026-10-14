@@ -9,7 +9,7 @@ Source code, experiment logs, and per-seed results for the paper:
 > ¹Department of Informatics Engineering, Faculty of Industrial Technology, Gunadarma University, Depok, Jawa Barat, Indonesia
 > ²Department of Immigration, Study Program in Immigration Technology Management, Indonesian Immigration and Corrections Polytechnic, Tangerang, Banten, Indonesia
 >
-> Submitted to *Bulletin of Electrical Engineering and Informatics (BEEI)*, submission 13400. Major revision returned 22 August 2026, revised version prepared.
+> Submitted to *Bulletin of Electrical Engineering and Informatics (BEEI)*, submission 13400. Major revision returned 22 August 2026, revised version submitted 14 October 2026.
 
 ## Overview
 
